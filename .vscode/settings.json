@@ -1,3 +1,19 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "192.168.203.77",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "bd_profe",
+            "database": "dam2_2425",
+            "username": "dam2"
+        }
+    ]
 }
