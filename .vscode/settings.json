@@ -8,12 +8,13 @@
             },
             "ssh": "Disabled",
             "previewLimit": 50,
-            "server": "192.168.203.77",
+            "server": "192.168.203.118",
             "port": 3306,
             "driver": "MySQL",
-            "name": "bd_profe",
             "database": "dam2_2425",
-            "username": "dam2"
+            "name": "bd_profe",
+            "username": "dam2",
+            "askForPassword": true
         }
     ]
 }

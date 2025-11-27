@@ -1,17 +1,17 @@
 package es.ciudadescolar.util;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +111,41 @@ public class DbManager
         }
         return alumnos;
         
+    }
+
+    public Alumno getAlumnoExpYNombre(int exped, String nombre){
+
+        Alumno al = null;
+        PreparedStatement pstAlumno = null;
+        ResultSet rstAlumno = null;
+        try {
+            pstAlumno = con.prepareStatement(SQL.RECUPERA_ALUMNOS_EXP);
+            pstAlumno.setInt(1, exped);
+            pstAlumno.setString(2, nombre);
+            rstAlumno = pstAlumno.executeQuery();
+            
+            if (rstAlumno.next()) {
+
+                al = new Alumno();
+
+                al = new Alumno(rstAlumno.getInt(1), rstAlumno.getString(2),rstAlumno.getDate(3));
+                LOG.debug("recuperado alumno con expediente: ["+exped +"]y nombre ["+ nombre+"]");
+            }
+        } catch (SQLException e) {
+           LOG.error("error durante la consuslta: " + e.getMessage());
+        }finally{
+
+            try {
+                if (rstAlumno != null) 
+                    rstAlumno.close();
+                if (pstAlumno != null)
+                    pstAlumno.close();
+            } catch (SQLException e) {
+                LOG.error("error liberando recurrsos de la consulta parametrizada");
+            }
+        }
+
+        return al;
     }
     public boolean cerrarBd()
     {
