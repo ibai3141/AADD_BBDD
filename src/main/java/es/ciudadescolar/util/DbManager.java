@@ -1,8 +1,7 @@
 package es.ciudadescolar.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,116 +10,125 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.ciudadescolar.instituto.Alumno;
 
-public class DbManager {
-    
+public class DbManager 
+{
     private static final Logger LOG = LoggerFactory.getLogger(DbManager.class);
-    private static final String DRIVER = "driver"; 
-    private static final String USER = "user"; 
+    private static final String DRIVER = "driver";
     private static final String URL = "url";
-    private static final String PASS = "password"; 
-
-    
-
+    private static final String USUARIO = "user";
+    private static final String PWD = "password";
 
     private Connection con = null;
-
-    public DbManager(){
-
+    
+    public DbManager()
+    {
         Properties prop = new Properties();
-        try {
-            prop.load(new FileInputStream("conexionBD.properties"));
+
+        try 
+        {
+            prop.load(new FileInputStream("conexionBD.properties"));   
         
+            // registramos driver (en versiones actuales no es necesario)
             Class.forName(prop.getProperty(DRIVER));
             //con = DriverManager.getConnection("jdbc:mysql://192.168.203.77:3306/dam2_2425", "dam2", "dam2");
-            con = DriverManager.getConnection(prop.getProperty(URL),prop.getProperty(USER), prop.getProperty(PASS));
-            LOG.debug("abierta satisfactoriamente");
-        }catch (IOException e) {
-            LOG.error("imposible cargar propiedades de la conexion");
-        } catch (ClassNotFoundException e) {
-            LOG.error("registro de driver con error:" + e.getMessage());   
-        } catch (SQLException e) {
-            LOG.error("imposible establecer la conexion con la BD:"+ e.getMessage());
+            con = DriverManager.getConnection(prop.getProperty(URL), prop.getProperty(USUARIO),prop.getProperty(PWD));
+            LOG.debug("Establecida conexión satisfactoriamente");
+        }
+        catch (IOException e) 
+        {
+            LOG.error("Imposible cargar propiedades de la conexión");
+        }
+        catch (ClassNotFoundException e) 
+        {
+            LOG.error("Registro de driver con error: "+ e.getMessage());
+        } catch (SQLException e) 
+        {
+            LOG.error("Imposible establecer conexion con la BD: "+e.getMessage());
         }
     }
 
-
-    public List<Alumno> mostarAlumnos(){
-
-        List<Alumno> listaAlumnos= new ArrayList<>();
-
-
+    public List<Alumno> mostrarAlumnos()
+    {
+        List<Alumno> alumnos = null;
 
         Statement stAlumnos = null;
 
-        ResultSet rstAlmunos = null;
-        Alumno alumno = null;
+        ResultSet rstAlumno = null;
 
-        if(con != null){
+        Alumno alumno =null;
 
-            try {
+        if (con != null)
+        {
+            try 
+            {
                 stAlumnos = con.createStatement();
-                rstAlmunos = stAlumnos.executeQuery(SQL.RECUPERA_ALUMNOS);
-
-                if(rstAlmunos.next()){
-
-                    do { 
+                rstAlumno = stAlumnos.executeQuery(SQL.RECUPERA_ALUMNOS);
+                
+                if (rstAlumno.next())
+                {
+                    alumnos = new ArrayList<Alumno>();
+                    do
+                    {
                         alumno = new Alumno();
-                        alumno.setExpediente(Integer.valueOf(rstAlmunos.getInt(1)));
-                        alumno.setNombre(rstAlmunos.getString(2));
-                        if (rstAlmunos.getDate(3) != null) {
-                            alumno.setFecha_nac(rstAlmunos.getDate(3).toLocalDate());
+                        alumno.setExpediente(Integer.valueOf(rstAlumno.getInt(1)));
+                        alumno.setNombre(rstAlumno.getString(2));
+                        
+                        Date fecha = rstAlumno.getDate(3);
+                        if (fecha != null)
+                            alumno.setFecha_nac(fecha.toLocalDate());
 
-                        }
-                        listaAlumnos.add(alumno);
-                    } while (rstAlmunos.next());
-
+                        alumnos.add(alumno);
+                    }while(rstAlumno.next());
                 }
-                LOG.debug("se ha ejecutado la select");
-            } catch (SQLException e) {
-
-                LOG.error("imposible consultar alumnos "+ e.getMessage());
+                
+                LOG.debug("Se ha ejecutado correctamente la sentencia SELECT");
             }
-            finally{
-
-                try {
-                    if(rstAlmunos != null){
-                    rstAlmunos.close();
-
-                    }
-                    if(stAlumnos != null){
+            catch (SQLException e) 
+            {
+                LOG.error("Imposible consultar alumnos: "+e.getMessage());
+            }
+            finally
+            {
+                try 
+                {
+                    if (rstAlumno != null) 
+                        rstAlumno.close();
+                    if (stAlumnos != null)
                         stAlumnos.close();
-                    }
-
-
-                } catch (SQLException e) {
-                    LOG.error("error durante el cierre"+ e.getMessage());
+                } catch (SQLException e) 
+                {
+                    LOG.error("Error durante el cierre de la conexión");
                 }
             }
         }
-
-        return  listaAlumnos;
-
+        return alumnos;
+        
     }
-
-    public boolean cerrar_bd(){
-
+    public boolean cerrarBd()
+    {
         boolean status = false;
 
-        if(con != null){
-            try {
+        if (con != null)
+        {
+            try 
+            {
                 con.close();
-                LOG.debug("cerrada satisfactoriamente");
+                LOG.debug("Cerrada conexión satisfactoriamente");
                 status = true;
-            } catch (SQLException e) {
-                LOG.error("error cerrando la conexion"+ e.getMessage());
+            } 
+            catch (SQLException e) 
+            {
+                LOG.error("Error cerrando la conexion: "+e.getMessage());
             }
         }
-
         return status;
     }
 }

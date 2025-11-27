@@ -1,3 +1,4 @@
+
 package es.ciudadescolar;
 
 import java.util.List;
@@ -5,23 +6,21 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.ciudadescolar.instituto.Alumno;
 import es.ciudadescolar.util.DbManager;
-
-public class Main {
-
+import es.ciudadescolar.instituto.Alumno;
+public class Main 
+{
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         DbManager manager = new DbManager();
 
-        manager.cerrar_bd();
+        List<Alumno> alumnos = manager.mostrarAlumnos();
 
-        List<Alumno> listaAlumnos = manager.mostarAlumnos();
-
-        for(Alumno alumno : listaAlumnos){
-
-            LOG.info(alumno.toString());
+        for (Alumno al: alumnos )
+        {
+            LOG.info(al.toString());
         }
+        manager.cerrarBd();
     }
 }
