@@ -147,6 +147,130 @@ public class DbManager
 
         return al;
     }
+
+
+    public boolean altaAlumno(Alumno alumno){
+        boolean status = false;
+
+        PreparedStatement pstNuevoAlumno = null;
+
+        if (con != null) {
+            
+            try {
+                pstNuevoAlumno = con.prepareStatement(SQL.ALTA_NUEVO_ALUMNO);
+                pstNuevoAlumno.setInt(1, alumno.getExpediente());
+                pstNuevoAlumno.setString(2, alumno.getNombre());
+                pstNuevoAlumno.setDate(3, Date.valueOf(alumno.getFecha_nac()));
+
+                // vale para insert update delete 
+                if(pstNuevoAlumno.executeUpdate() == 1){
+
+                    LOG.debug("inserccion realizada conrectamente: "+ alumno.toString());
+                    status = true;
+                };
+            } catch (SQLException e) {
+                LOG.error("error durante el alta del alumno: "+ e.getMessage());
+            }finally{
+                if (pstNuevoAlumno!= null) {
+                    
+                    try {
+                        pstNuevoAlumno.close();
+                        LOG.debug("la liberacion de recursos ha ido bien");
+                    } catch (Exception e) {
+                        LOG.error("error liberando recurrsos de la consulta parametrizada");
+                    }
+                }
+            }
+        }
+
+
+        return status;
+    }
+
+    public boolean modificarNombreAlumno(Alumno alumno){
+        boolean status = false;
+
+        PreparedStatement pstCambioAlumno = null;
+
+        if (con != null) {
+            
+            try {
+                pstCambioAlumno = con.prepareStatement(SQL.ALTA_NUEVO_ALUMNO);
+                pstCambioAlumno.setString(1, alumno.getNombre());
+                pstCambioAlumno.setInt(2, alumno.getExpediente());
+                
+                // vale para insert update delete 
+                if(pstCambioAlumno.executeUpdate() == 1){
+
+                    LOG.debug("actualizacion realizada conrectamente: "+ alumno.toString());
+                    status = true;
+                };
+            } catch (SQLException e) {
+                LOG.error("error durante el alta del alumno: "+ e.getMessage());
+            }finally{
+                if (pstCambioAlumno!= null) {
+                    
+                    try {
+                        pstCambioAlumno.close();
+                        LOG.debug("la liberacion de recursos ha ido bien");
+                    } catch (Exception e) {
+                        LOG.error("error liberando recurrsos de la consulta parametrizada");
+                    }
+                }
+            }
+        }
+
+
+        return status;
+    }
+
+
+    public boolean borrarAlumno(int expediente){
+        boolean status = false;
+
+        PreparedStatement pstboradoAlumno = null;
+
+        if (con != null) {
+            
+            try {
+                pstboradoAlumno = con.prepareStatement(SQL.BORRAR_ALUMNO);
+                pstboradoAlumno.setInt(1, expediente);
+                
+                // vale para insert update delete 
+                if(pstboradoAlumno.executeUpdate() == 1){
+
+                    LOG.debug("actualizacion realizada conrectamente: "+ expediente);
+                    status = true;
+                };
+            } catch (SQLException e) {
+                LOG.error("error durante borrado: "+ e.getMessage());
+            }finally{
+                if (pstboradoAlumno!= null) {
+                    
+                    try {
+                        pstboradoAlumno.close();
+                        LOG.debug("la liberacion de recursos ha ido bien");
+                    } catch (Exception e) {
+                        LOG.error("error liberando recurrsos de la consulta parametrizada");
+                    }
+                }
+            }
+        }
+
+
+        return status;
+    }
+
+
+
+
+
+
+
+
+
+
+
     public boolean cerrarBd()
     {
         boolean status = false;

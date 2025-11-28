@@ -1,6 +1,8 @@
 
 package es.ciudadescolar;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -27,6 +29,19 @@ public class Main
         if (buscado != null) {
             LOG.info("alumno localizado: "+ buscado);           
         }
+
+        Alumno alumnoNuevo = new Alumno(67, "ibai", Date.valueOf(LocalDate.of(2001, 10, 03)));
+        if(!manager.altaAlumno(alumnoNuevo)){
+            LOG.warn("no se ha podido dar de alta el alumno: "+ alumnoNuevo.toString());
+        }
+
+        Alumno alumnox = new Alumno(67, "Francisco",Date.valueOf(LocalDate.of(2004, 10, 6)));
+
+        alumnoNuevo.setNombre("juan");
+
+        manager.modificarNombreAlumno(alumnoNuevo);
+
+        //manager.borrarAlumno(67);
 
         manager.cerrarBd();
 
