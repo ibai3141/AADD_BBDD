@@ -2,6 +2,8 @@ package es.ciudadescolar.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.PublicKey;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -9,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -261,15 +264,123 @@ public class DbManager
         return status;
     }
 
+    // muestra el alumno por expediente
+    public boolean muestraAlumnos(int expediente){
+
+        boolean status = false;
+        //se necesita para sp y func
+        CallableStatement cs = null;
+
+        if (con != null) {
+
+            try {
+                cs = con.prepareCall(SQL.INVOCION_SP_INFO_ALUMNO);
+
+                cs.setInt(1, expediente);
+
+                cs.execute();
+                LOG.debug("invocacion al sp satisfactoria ["+ SQL.INVOCION_SP_INFO_ALUMNO +"] con el parametro :" + expediente);
+                status = true;
+            } catch (SQLException e) {
+                LOG.error("erro durante la invocacion del sp: "+ e.getMessage());
+            }finally{
+                if(cs != null){
+                    try {
+                        cs.close();
+                        LOG.debug("se ha cerrado");
+                    } catch (SQLException e) {
+                        LOG.error("imposible cerrar el colableStatement");
+                    }
+                }
+            }
+            
+        }
 
 
 
 
 
+        return  status;
+    }
+
+    // muestra el alumno por expediente
+    public int recuperaAlumnosSP(){
+
+        //se necesita para sp y func
+        CallableStatement cs = null;
+
+        int numeroAlumnos = -1;
+
+        if (con != null) {
+
+            try {
+                cs = con.prepareCall(SQL.INVOCION_SP_GET_NUM_ALUMNOS);
+
+                //registramos el parametro como de SALIDA para luego porder recuperar su valor tras la ejecucion
+                cs.registerOutParameter(1, Types.INTEGER);
+
+                cs.execute();
+                
+                numeroAlumnos = cs.getInt(1);
+                LOG.debug("invocacion al sp satisfactoria ["+ SQL.INVOCION_SP_GET_NUM_ALUMNOS +"] con el parametro  de salida : "+ numeroAlumnos );
+            } catch (SQLException e) {
+                LOG.error("erro durante la invocacion del sp: "+ e.getMessage());
+            }finally{
+                if(cs != null){
+                    try {
+                        cs.close();
+                        LOG.debug("se ha cerrado");
+                    } catch (SQLException e) {
+                        LOG.error("imposible cerrar el colableStatement");
+                    }
+                }
+            }
+            
+        }
+
+        return  numeroAlumnos;
+    }
+
+    public int getNotaAlumno(int exp){
+        int nota = -1;
+
+        CallableStatement csFun = null;
+
+        if (con != null) {
+
+            try {
+                //se añade la consulta
+                csFun = con.prepareCall(SQL.INVOCION_FUNC_GET_NOTA_ALUMNO);
+                // se registra los parametros de salida
+                csFun.registerOutParameter(1, Types.INTEGER);
+                // se asigna el parametro de entrada
+                csFun.setInt(2, exp);
+                // se ejecuta la query
+                csFun.execute();
+
+                // se añade la nota tras la ejecucion
+                nota = csFun.getInt(1);
+
+                LOG.debug("relaizada correctamente la funcion nota :"+ nota+" para el alumno con expediente: "+ exp);
+
+            } catch (SQLException e) {
+                LOG.error("erro durante la unvocacion a funcion de la nota alumno: "+ exp+"]: "+ e.getMessage());
+            }finally{
+                if(csFun != null){
+                    try {
+                        csFun.close();
+                        LOG.debug("la liberaciond de recursos en la invocacion de la funcion ha sido satisfactoria");
+                    } catch (SQLException e) {
+                        LOG.error("error durante la liberacion de recursos: " + e.getMessage());
+                    }
+                }
+            }
+            
+        }
 
 
-
-
+        return nota;
+    }
 
     public boolean cerrarBd()
     {

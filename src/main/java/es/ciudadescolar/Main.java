@@ -1,14 +1,9 @@
 
 package es.ciudadescolar;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.ciudadescolar.instituto.Alumno;
 import es.ciudadescolar.util.DbManager;
 public class Main 
 {
@@ -16,7 +11,7 @@ public class Main
     public static void main(String[] args) 
     {
         DbManager manager = new DbManager();
-
+        /* 
         List<Alumno> alumnos = manager.mostrarAlumnos();
 
         for (Alumno al: alumnos )
@@ -42,7 +37,27 @@ public class Main
         manager.modificarNombreAlumno(alumnoNuevo);
 
         //manager.borrarAlumno(67);
+         int expediente = 67;
+        if(!manager.muestraAlumnos(67)){
+            LOG.warn("no se ha invocado conrrectamente el sp para mostrar el alumno con expediente: "+ expediente);
+        }
+        */        
+        int numAlumnos = manager.recuperaAlumnosSP();
+        if(numAlumnos < 0){
+            LOG.warn("error durante el invacode del sp para recuperar los alumnos");
 
+        }else{
+            LOG.info("el numero de alumnos en la base de datos es :" + numAlumnos);
+        }
+
+        int notaAlumno = manager.getNotaAlumno(2);
+
+        if(notaAlumno == 0){
+            LOG.warn("no se ha recuperado nota  durante la invocacion de sp del alumno con el expediente " +2);
+
+        }else{
+            LOG.info("la nota del alumno es :" + notaAlumno);
+        }
         manager.cerrarBd();
 
     }
