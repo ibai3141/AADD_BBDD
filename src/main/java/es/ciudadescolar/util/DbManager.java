@@ -401,4 +401,58 @@ public class DbManager
         }
         return status;
     }
+
+
+
+    public boolean altaAlumnosTransac(List<Alumno> alumnosNuevos){
+
+        boolean status = true;
+
+        PreparedStatement pstAltaAlumno = null;
+
+        if (con != null) {
+
+            try {
+                pstAltaAlumno = con.prepareStatement(SQL.ALTA_NUEVO_ALUMNO);
+                con.setAutoCommit(false);//desde aqui soy responsable de hacer commit o rollback
+
+                for(Alumno al : alumnosNuevos){
+
+                    pstAltaAlumno.setInt(1, al.getExpediente());
+                    pstAltaAlumno.setString(2, al.getNombre());
+                    pstAltaAlumno.setDate(3, Date.valueOf(al.getFecha_nac()));
+
+                    pstAltaAlumno.executeUpdate();//hace inser, update, del
+                    pstAltaAlumno.clearParameters();// si se queda algun valor de la iteracion anterior, se empieza de 0
+                    //como queremos reutilizar nos aseguramos que se borren parametros de iteracion previa
+                }
+                con.commit();
+                LOG.debug("se han confirmado todos los cambios");
+
+
+
+            } catch (SQLException e) {
+                LOG.error("erroo duarante el alta de alumnos de forma transacional");
+                try {
+                    con.rollback();
+                    LOG.debug("rollback realizado correctamente");
+                } catch (SQLException e1) {
+                    LOG.error("error haciendo rollback durante la transaccion: "+ e.getMessage());
+                }
+            }finally{
+                if(pstAltaAlumno != null){
+                    try {
+                        pstAltaAlumno.close();
+                        con.setAutoCommit(true);// se restaura autocomit para que bajo la misma sesion cualquier alta baja o modi haga comit automaticamente
+                    } catch (SQLException e) {
+                       LOG.error("erro en la liberacion de recursos en el alta transaccional");
+                    }
+                    LOG.debug("liberacion de recuros de forma transacionlas");
+                }
+            }
+        }
+
+
+        return status;
+    }
 }

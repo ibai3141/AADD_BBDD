@@ -1,9 +1,15 @@
 
 package es.ciudadescolar;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.ciudadescolar.instituto.Alumno;
 import es.ciudadescolar.util.DbManager;
 public class Main 
 {
@@ -41,7 +47,7 @@ public class Main
         if(!manager.muestraAlumnos(67)){
             LOG.warn("no se ha invocado conrrectamente el sp para mostrar el alumno con expediente: "+ expediente);
         }
-        */        
+             
         int numAlumnos = manager.recuperaAlumnosSP();
         if(numAlumnos < 0){
             LOG.warn("error durante el invacode del sp para recuperar los alumnos");
@@ -58,6 +64,17 @@ public class Main
         }else{
             LOG.info("la nota del alumno es :" + notaAlumno);
         }
+        manager.cerrarBd();
+        */
+
+        List<Alumno> nuevosAlumnos = new ArrayList<>();
+
+        nuevosAlumnos.add(new Alumno(523, "juan", Date.valueOf(LocalDate.of(2000, 9, 23))));
+        nuevosAlumnos.add(new Alumno(522, "jorge", Date.valueOf(LocalDate.of(2000, 9, 23))));
+        nuevosAlumnos.add(new Alumno(521, "tilin insano", Date.valueOf(LocalDate.of(2000, 9, 23))));
+
+        if(!manager.altaAlumnosTransac(nuevosAlumnos))
+
         manager.cerrarBd();
 
     }
